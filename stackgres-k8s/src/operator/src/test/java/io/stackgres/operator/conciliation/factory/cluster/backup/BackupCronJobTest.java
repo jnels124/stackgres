@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 OnGres, Inc.
+ * Copyright (C) 2024 OnGres, Inc.
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -70,7 +70,7 @@ public class BackupCronJobTest {
     sgCluster = Fixtures.cluster().loadSchedulingBackup().get();
     backupPerformance = new BackupPerformance(10L, 10L, 1, null, null);
     backupConfig =
-        new BackupConfiguration(5, "* * * 5 *", "10", "/tmp", backupPerformance, null, null, null, null, null);
+        new BackupConfiguration(5, "* * * 5 *", "10", "/tmp", backupPerformance, null, null, null, null, null, null);
     sgBackup.getSpec().setSgCluster(sgCluster.getMetadata().getName());
   }
 

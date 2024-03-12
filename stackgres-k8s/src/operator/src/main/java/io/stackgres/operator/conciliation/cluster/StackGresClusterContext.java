@@ -39,6 +39,7 @@ import io.stackgres.common.crd.storages.BackupStorage;
 import io.stackgres.operator.common.PrometheusContext;
 import io.stackgres.operator.conciliation.GenerationContext;
 import io.stackgres.operator.conciliation.backup.BackupConfiguration;
+import io.stackgres.operator.conciliation.backup.BackupEncryption;
 import io.stackgres.operator.conciliation.backup.BackupPerformance;
 import org.immutables.value.Value;
 import org.jetbrains.annotations.NotNull;
@@ -181,7 +182,10 @@ public interface StackGresClusterContext extends GenerationContext<StackGresClus
             bc.getVolumeSnapshotClass(),
             bc.getFastVolumeSnapshot(),
             bc.getTimeout(),
-            bc.getReconciliationTimeout()));
+            bc.getReconciliationTimeout(),
+            Optional.ofNullable(bc.getEncryption())
+                .map(be -> new BackupEncryption(be.getMethod(), be.getPrivateKey()))
+                .orElse(null)));
   }
 
   default Optional<BackupStorage> getBackupStorage() {
@@ -246,6 +250,7 @@ public interface StackGresClusterContext extends GenerationContext<StackGresClus
                 bp.getUploadConcurrency(),
                 bp.getDownloadConcurrency()))
             .orElse(null),
+            null,
             null,
             null,
             null,

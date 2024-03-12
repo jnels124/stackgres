@@ -385,6 +385,23 @@ spec:
                               minimum: 1
                               description: |
                                 Backup storage may use several concurrent streams to store the data. This parameter configures the number of parallel streams to use. By default, it's set to 1 (use one stream).
+                    encryption:
+                      type: object
+                      description: |
+                        Select the backup encryption algorithm. Possible options are: Sodium, OpenPGP. The default method is no encryption.
+                      properties:
+                        method:
+                          type: string
+                          enum: [Sodium, OpenPGP]
+                          description: |
+                            Specifies the method of encryption used for encrypting backups.
+                            Possible values:
+                            * `Sodium`: LibSodium
+                            * `OpenPGP`: OpenPGP
+                        privateKey:
+                          type: string
+                          description: |
+                            The private key used for encrypt/decrypt the backup
                     compression:
                       type: string
                       description: |

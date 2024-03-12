@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.stackgres.common.StackGresUtil;
+import io.stackgres.common.crd.sgcluster.StackGresClusterBackupEncryption;
 import io.sundr.builder.annotations.Buildable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -32,6 +33,9 @@ public class StackGresBaseBackupConfig {
 
   @Valid
   private StackGresBaseBackupPerformance performance;
+
+  @Valid
+  private StackGresClusterBackupEncryption encryption;
 
   public Integer getRetention() {
     return retention;
@@ -65,9 +69,17 @@ public class StackGresBaseBackupConfig {
     this.performance = performance;
   }
 
+  public StackGresClusterBackupEncryption getEncryption() {
+    return encryption;
+  }
+
+  public void setEncryption(StackGresClusterBackupEncryption encryption) {
+    this.encryption = encryption;
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(compression, cronSchedule, performance, retention);
+    return Objects.hash(compression, cronSchedule, performance, retention, encryption);
   }
 
   @Override
@@ -82,7 +94,8 @@ public class StackGresBaseBackupConfig {
     return Objects.equals(compression, other.compression)
         && Objects.equals(cronSchedule, other.cronSchedule)
         && Objects.equals(performance, other.performance)
-        && Objects.equals(retention, other.retention);
+        && Objects.equals(retention, other.retention)
+        && Objects.equals(encryption, other.encryption);
   }
 
   @Override

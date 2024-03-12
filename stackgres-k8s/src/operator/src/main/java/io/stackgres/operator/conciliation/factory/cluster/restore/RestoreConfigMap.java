@@ -38,6 +38,7 @@ import io.stackgres.common.crd.sgcluster.StackGresClusterSpec;
 import io.stackgres.common.labels.LabelFactoryForCluster;
 import io.stackgres.operator.conciliation.OperatorVersionBinder;
 import io.stackgres.operator.conciliation.backup.BackupConfiguration;
+import io.stackgres.operator.conciliation.backup.BackupEncryption;
 import io.stackgres.operator.conciliation.backup.BackupPerformance;
 import io.stackgres.operator.conciliation.cluster.StackGresClusterContext;
 import io.stackgres.operator.conciliation.factory.ImmutableVolumePair;
@@ -180,7 +181,11 @@ public class RestoreConfigMap extends AbstractBackupConfigMap
               null,
               null,
               null,
-              null
+              null,
+            Optional.of(backupConfig.getBaseBackups())
+              .map(StackGresBaseBackupConfig::getEncryption)
+              .map(e -> new BackupEncryption(e.getMethod(), e.getPrivateKey()))
+              .orElse(null)
           ))
       );
     }

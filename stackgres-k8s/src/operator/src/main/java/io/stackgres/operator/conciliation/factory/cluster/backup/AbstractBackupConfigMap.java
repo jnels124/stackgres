@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 OnGres, Inc.
+ * Copyright (C) 2024 OnGres, Inc.
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -73,6 +73,18 @@ public abstract class AbstractBackupConfigMap {
         .ifPresent(uploadDiskConcurrency -> backupEnvVars.put(
             "WALG_DOWNLOAD_CONCURRENCY",
             BackupStorageUtil.convertEnvValue(uploadDiskConcurrency)));
+
+    Optional.ofNullable(backupConfiguration)
+        .map(BackupConfiguration::encryption)
+        .ifPresent(e -> {
+          switch (e.method()) {
+            case "Sodium" -> backupEnvVars.put("WALG_LIBSODIUM_KEY", e.privateKey());
+
+            case "OpenPGP" -> backupEnvVars.put("WALG_PGP_KEY", e.privateKey());
+
+            default -> { } // No encryption
+          }
+        });
 
     if (WAL_G_LOGGER.isTraceEnabled()) {
       backupEnvVars.put("WALG_LOG_LEVEL", "DEVEL");

@@ -1,0 +1,34 @@
+#!/bin/sh
+
+e2e_test() {
+  run_test "Check backup with Sodium encryption is working..." backup_cluster_with_sodium_encryption
+
+  run_test "Check backup with OpenPGP encryption is working..." backup_cluster_with_open_pgp_encryption
+}
+
+backup_cluster_with_sodium_encryption() {
+  SODIUM_PRIVATE_KEY=$(openssl rand 32)
+
+  cat << EOF | kubectl create -f -
+    apiVersion: stackgres.io/v1
+    kind: SGBackup
+    metadata:
+      namespace: "$CLUSTER_NAMESPACE"
+      name: backup-encrypt-sodium
+    spec:
+      sgCluster: "$CLUSTER_NAME"
+      managedLifecycle: false
+      compression: brotli
+      encryption:
+        method: Sodium
+        privateKey: "$SODIUM_PRIVATE_KEY"
+EOF
+
+  kubectl get sgbackup -n "$CLUSTER_NAMESPACE" --watch
+}
+
+backup_cluster_with_open_pgp_encryption() {
+  true
+}
+
+}

@@ -51,6 +51,8 @@ public class StackGresClusterBackupConfiguration {
 
   private Integer reconciliationTimeout;
 
+  private StackGresClusterBackupEncryption encryption;
+
   public Integer getRetention() {
     return retention;
   }
@@ -139,10 +141,18 @@ public class StackGresClusterBackupConfiguration {
     this.reconciliationTimeout = reconciliationTimeout;
   }
 
+  public StackGresClusterBackupEncryption getEncryption() {
+    return encryption;
+  }
+
+  public void setEncryption(StackGresClusterBackupEncryption encryption) {
+    this.encryption = encryption;
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(compression, cronSchedule, fastVolumeSnapshot, path, performance, reconciliationTimeout,
-        retention, sgObjectStorage, timeout, useVolumeSnapshot, volumeSnapshotClass);
+        retention, sgObjectStorage, timeout, useVolumeSnapshot, volumeSnapshotClass, encryption);
   }
 
   @Override
@@ -160,7 +170,8 @@ public class StackGresClusterBackupConfiguration {
         && Objects.equals(reconciliationTimeout, other.reconciliationTimeout)
         && Objects.equals(retention, other.retention) && Objects.equals(sgObjectStorage, other.sgObjectStorage)
         && Objects.equals(timeout, other.timeout) && Objects.equals(useVolumeSnapshot, other.useVolumeSnapshot)
-        && Objects.equals(volumeSnapshotClass, other.volumeSnapshotClass);
+        && Objects.equals(volumeSnapshotClass, other.volumeSnapshotClass)
+        && Objects.equals(encryption, other.encryption);
   }
 
   @Override
