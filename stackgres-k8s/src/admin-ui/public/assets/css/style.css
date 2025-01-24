@@ -444,6 +444,10 @@ svg.background circle {
     margin: 0 !important;
 }
 
+.noMarginBottom {
+    margin-bottom: 0 !important;
+}
+
 .noBorder {
     border: 0 !important;
 }
@@ -2158,7 +2162,7 @@ td.timestamp, th.timestamp {
     margin-bottom: 20px;
 }
 
-.form .col input, .form .col select {
+.form .col > input, .form .col > select {
     margin-bottom: 0;
 }
 
