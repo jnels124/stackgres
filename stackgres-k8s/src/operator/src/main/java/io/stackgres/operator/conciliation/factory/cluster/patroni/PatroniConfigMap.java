@@ -5,12 +5,6 @@
 
 package io.stackgres.operator.conciliation.factory.cluster.patroni;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import io.fabric8.kubernetes.api.model.ConfigMap;
@@ -22,6 +16,7 @@ import io.stackgres.common.ClusterContext;
 import io.stackgres.common.ClusterPath;
 import io.stackgres.common.EnvoyUtil;
 import io.stackgres.common.PatroniUtil;
+import io.stackgres.common.StackGresContext;
 import io.stackgres.common.StackGresUtil;
 import io.stackgres.common.StackGresVolume;
 import io.stackgres.common.YamlMapperProvider;
@@ -41,6 +36,11 @@ import io.stackgres.operator.conciliation.factory.VolumeFactory;
 import io.stackgres.operator.conciliation.factory.VolumePair;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +53,7 @@ public class PatroniConfigMap implements VolumeFactory<StackGresClusterContext> 
   public static final int PATRONI_LOG_FILE_SIZE = 256 * 1024 * 1024;
 
   private static final Logger PATRONI_LOGGER = LoggerFactory.getLogger("io.stackgres.patroni");
+  private static final String PREFIXED_SHARDS_KEY = StackGresContext.STACKGRES_KEY_PREFIX + StackGresContext.SHARDS_KEY;
 
   private final LabelFactoryForCluster labelFactory;
   private final PatroniConfigEndpoints patroniConfigEndpoints;
@@ -117,8 +118,15 @@ public class PatroniConfigMap implements VolumeFactory<StackGresClusterContext> 
         .map(Object::toString)
         .orElse("60"));
     data.put("PATRONI_POSTGRESQL_LISTEN", (isEnvoyDisabled ? "0.0.0.0:" : "127.0.0.1:") + EnvoyUtil.PG_PORT);
-    data.put("PATRONI_POSTGRESQL_CONNECT_ADDRESS",
-        "${POD_IP}:" + (isEnvoyDisabled ? EnvoyUtil.PG_PORT : EnvoyUtil.PG_REPL_ENTRY_PORT));
+
+    // Use ENTRY_PORT for shards and REPL_ENTRY_PORT for coordinators
+    var labels = cluster.getMetadata().getLabels();
+    boolean isShards = Boolean.parseBoolean(labels.getOrDefault(PREFIXED_SHARDS_KEY, "false"));
+
+    int port = isEnvoyDisabled ? EnvoyUtil.PG_PORT : EnvoyUtil.PG_REPL_ENTRY_PORT;
+    int portOverride = isShards ? EnvoyUtil.PG_ENTRY_PORT : port;
+
+    data.put("PATRONI_POSTGRESQL_CONNECT_ADDRESS", "${POD_IP}:" + portOverride);
 
     data.put("PATRONI_RESTAPI_LISTEN", "0.0.0.0:" + EnvoyUtil.PATRONI_PORT);
     data.put("PATRONI_POSTGRESQL_DATA_DIR", ClusterPath.PG_DATA_PATH.path());
