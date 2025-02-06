@@ -123,8 +123,9 @@ public class PatroniConfigMap implements VolumeFactory<StackGresClusterContext> 
     var labels = cluster.getMetadata().getLabels();
     boolean isShards = Boolean.parseBoolean(labels.getOrDefault(PREFIXED_SHARDS_KEY, "false"));
 
-    int port = isEnvoyDisabled ? EnvoyUtil.PG_PORT : EnvoyUtil.PG_REPL_ENTRY_PORT;
-    int portOverride = isShards ? EnvoyUtil.PG_ENTRY_PORT : port;
+    int coordinatorPort = isEnvoyDisabled ? EnvoyUtil.PG_PORT : EnvoyUtil.PG_REPL_ENTRY_PORT;
+    int shardPort = isEnvoyDisabled ?  EnvoyUtil.PG_POOL_PORT : EnvoyUtil.PG_ENTRY_PORT;
+    int portOverride = isShards ? shardPort : coordinatorPort;
 
     data.put("PATRONI_POSTGRESQL_CONNECT_ADDRESS", "${POD_IP}:" + portOverride);
 
